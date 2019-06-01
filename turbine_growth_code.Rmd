@@ -15,15 +15,15 @@ all_turbines <- readr::read_csv("uswtdb_v2_0_20190417.csv")
 
   
   
-  This project will look at The U.S. Wind Turbine Database. The data locates all wind turbines in the United States from the U.S. Geological Survey and offers information about a number of variables, including, make, power generation capacity, and year built. The dataset can be found at <https://eerscmap.usgs.gov/uswtdb/>
+  This project will look at The U.S. Wind Turbine Database. The data locates all wind turbines in the United States from the U.S. Geological Survey and offers information about a number of variables, including make, power generation capacity, and year built. The dataset can be found at <https://eerscmap.usgs.gov/uswtdb/>
 
 1. What is the problem you want to solve?
 
-  The overall goal is to understand changes in the wind industry. What types of Turbines are different manufacturers heading towards, in what geographic areas are we likely to see growth?
+  The overall goal is to understand changes in the wind industry. What types (capacity) of Turbines different manufacturers have built, in what geographic areas are we likely to see growth?
   
 2. Who is your client and why do they care about this problem? In other words, what will your client DO or DECIDE based on your analysis that they wouldn’t have otherwise?
 
-  This analysis could be useful for power companies expanding into wind energy, states and governments determining policy around wind energy. Entrepeneurs considering buying wind energy assets.
+  This analysis will be useful for power companies expanding into wind energy, states and governments determining policy around wind energy. Investors buying wind energy assets.
 
 3. What data are you going to use for this? How will you acquire this data?
 
@@ -35,7 +35,7 @@ all_turbines <- readr::read_csv("uswtdb_v2_0_20190417.csv")
 
 5. What are your deliverables? Typically, this would include code, along with a paper and/or a slide deck.
 
-  Slides with plots comparing manufacturers' growth in total capacity, geographic areas covered. Offer suggestions in a paper about where wind farm development is likely to occur in the future, what type of turbine the industry is finding to be most effective (larger versus smaller), and which manufacturers will be leaders. Some package of code taylored to this dataset for making comparisons.
+  Slides with plots comparing manufacturers' growth in total capacity, geographic areas covered. Offer suggestions in a paper about where wind farm development is likely to occur in the future, what type of turbine the industry is finding to be most effective (larger versus smaller), and which manufacturers will be leaders. Some package of code tailored to this dataset for making comparisons.
 
 ## An Example of a Plot using this data
 
