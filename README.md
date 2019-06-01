@@ -1,8 +1,8 @@
 
 ## Anticipating the Wind Turbine of the future. 
-Max Davis
-
 Capstone Project Proposal
+
+Max Davis
 
 <img src="images/IMG_0686.JPG" width="200" height="150">
 
