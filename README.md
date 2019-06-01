@@ -2,7 +2,7 @@
 ## Anticipating the Wind Turbine of the future. 
 
 
-![](images/IMG_0686.JPG)
+<img src="images/IMG_0686.JPG" width="200" height="150">
 
   
   
