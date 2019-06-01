@@ -1,11 +1,4 @@
----
-title: "Wind Turbine Production in The US"
-author: "Max Davis"
-output: html_document
----
-```{r, include = FALSE}
-all_turbines <- readr::read_csv("uswtdb_v2_0_20190417.csv")
-```
+
 ## Anticipating the Wind Turbine of the future. 
 
 
