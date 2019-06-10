@@ -10,7 +10,7 @@ Max Davis
   
   This project will look at The U.S. Wind Turbine Database. The data locates all wind turbines in the United States from the U.S. Geological Survey and offers information about a number of variables, including make, power generation capacity, and year built. The dataset can be found at <https://eerscmap.usgs.gov/uswtdb/>
 
-_1. What is the problem you want to solve?_
+__1. What is the problem you want to solve?__
 
   The overall goal is to understand changes in the wind industry. What types (capacity) of Turbines different manufacturers have built, in what geographic areas are we likely to see growth?
   
