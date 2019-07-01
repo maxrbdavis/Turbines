@@ -1,4 +1,12 @@
 
+The "Limited La Haute Borne Data" is the readings of sensors for one turbine over the course of two years? The data is available at
+<https://opendata-renewables.engie.com/explore/dataset/la-haute-borne-data-2017-2020/export/>
+
+This data may be good for machine learning.
+
+
+
+
 ## Anticipating the Wind Turbine of the future. 
 Capstone Project Proposal
 
