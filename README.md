@@ -1,9 +1,8 @@
 
 The "Limited La Haute Borne Data" is the readings of sensors for one turbine over the course of two years? The data is available at
-<https://opendata-renewables.engie.com/explore/dataset/la-haute-borne-data-2017-2020/export/>
+<https://opendata-renewables.engie.com/explore/dataset/la-haute-borne-data-2017-2020/export/> This data may be good for machine learning as it has various sensor readouts at various times. 
 
-This data may be good for machine learning.
-
+The "Haute Borne Markdown" file has my initial coding for turning the entries for the first row of each column into the name of that column. 
 
 
 
