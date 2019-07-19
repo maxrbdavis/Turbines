@@ -1,12 +1,8 @@
 
-The "Limited La Haute Borne Data" is the readings of sensors for one turbine over the course of two years? The data is available at
-<https://opendata-renewables.engie.com/explore/dataset/la-haute-borne-data-2017-2020/export/> This data may be good for machine learning as it has various sensor readouts at various times. 
-
-The "Haute Borne Markdown" file has my initial coding for turning the entries for the first row of each column into the name of that column. 
 
 
 
-## Anticipating the Wind Turbine of the future. 
+## Model of Wind Turbine Production. 
 Capstone Project Proposal
 
 Max Davis
@@ -15,40 +11,32 @@ Max Davis
 
   
   
-  This project will look at The U.S. Wind Turbine Database. The data locates all wind turbines in the United States from the U.S. Geological Survey and offers information about a number of variables, including make, power generation capacity, and year built. The dataset can be found at <https://eerscmap.usgs.gov/uswtdb/>
+This project analyzes data from the Haute Borne wind farm in France. It contains readings from sensors on four wind turbines from 2017 to 2020. 
+<https://opendata-renewables.engie.com/explore/dataset/la-haute-borne-data-2017-2020/export/> This data may be good for machine learning as it has various sensor readouts at various times. 
+
+The "Haute Borne Markdown" file has my initial coding for turning the entries for the first row of each column into the name of that column. 
+
 
 __1. What is the problem you want to solve?__
 
-  The overall goal is to understand changes in the wind industry. What types (capacity) of Turbines different manufacturers have built, in what geographic areas are we likely to see growth?
+  The overall goal is to understand what variables determine the power output of wind turbines, so we have a model that shows, based on past data, what we might expect power ouput to be, givenother variables.
   
 __2. Who is your client and why do they care about this problem? In other words, what will your client DO or DECIDE based on your analysis that they wouldn’t have otherwise?__
 
-  This analysis will be useful for power companies expanding into wind energy, states and governments determining policy around wind energy. Investors buying wind energy assets.
+  This analysis would be useful for owners of the smae model of wind turbine in other areas, or those looking to acquire wind assets and determine the suitability of this model to the conditions in a given location.
 
 __3. What data are you going to use for this? How will you acquire this data?__
 
-  The U.S. Wind Turbine Database is available for free through the American Wind Energy Association.
+  The Haute Borne Wind Farm data is available for free through ENGIE open data.
 
 __4. In brief, outline your approach to solving this problem (knowing that this might change later).__
 
-  I will compare various manufacturers on several variables over time.
+  I will compare vriables and their relationship to power output, and try to predict outputs based on the large amount of data available.
 
 __5. What are your deliverables? Typically, this would include code, along with a paper and/or a slide deck.__
 
-  Slides with plots comparing manufacturers' growth in total capacity, geographic areas covered. Offer suggestions in a paper about where wind farm development is likely to occur in the future, what type of turbine the industry is finding to be most effective (larger versus smaller), and which manufacturers will be leaders. Some package of code tailored to this dataset for making comparisons.
+  Slides with plots. Offer suggestions in a paper about where wind farm development is likely to occur in the future, what type of turbine Some package of code tailored to this dataset for making comparisons.
 
 ## An Example of a Plot using this data
 
 
-```{r all_turbines, echo=FALSE}
-plot(all_turbines[["p_year"]], all_turbines[["t_cap"]], 
-     main = "Turbine Capacity Over Time",
-     xlab = "Year Built",
-     ylab = "Turbine Capacity (kW)",
-    pch = 20,
-    col = "darkgreen"
-    )
-```
-
-
-  As the plot shows, as more turbines have been built over time, the range of capacities has expanded.
