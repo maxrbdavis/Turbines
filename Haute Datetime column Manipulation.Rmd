@@ -1,0 +1,38 @@
+---
+title: "haute date column manipulation"
+author: "Max Davis"
+date: "7/19/2019"
+output: html_document
+---
+
+(optional) Make Date_time into two columns "date" and "time".
+
+```{r}
+haute <- separate(haute, "Date_time", c("date", "time"), sep = "T", remove = TRUE, convert = FALSE, extra = "warn", fill = "warn")
+
+```
+
+
+(optional2) Make Date into date format:
+
+```{r}
+as.Date(haute$date, "%Y-%m-%d")
+```
+
+(optional3)
+```{r}
+haute <- separate(haute, "date", c("year", "month", "day"))
+```
+(optional4)
+```{r}
+haute %>%
+  group_by(day)
+```
+(optional5)
+```{r}
+    gather(haute, key = "day", value = "time",  "day_time")
+```
+(optional6)
+```{r}
+separate(haute, "time", c("time", "0600"), sep = "-")
+```
