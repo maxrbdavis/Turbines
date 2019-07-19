@@ -1,0 +1,12 @@
+---
+title: "Description of Haute Data Cleaning"
+author: "Max Davis"
+date: "7/19/2019"
+output: html_document
+---
+
+ To clean the data for a better analysis I have taken steps to rename all of the variables which were only names with a non-descriptive one or two letter name and then either a "min", "max" or "avg" appended to it. The two letter names stand for a sensor reading such as "Nu" for "Apparent_power", and so on. The full description of each variable was found in a file that could be downloade along with the data. 
+ 
+ To change the names and make the data table more readable, I wrote a function for each two letter code using "gsub()" that I then applied one after the other. But first I separated those variables that would result with a two letter name in them inherently. This was so that changing all instances of "P" to "Active_power" would not affect the first letter in an instance of "Pitch_angle_setpoint" creating the messy resulting variable name: "Active_poweritch_angle_setpoint".
+ 
+ In addition to changing the column names for readbility, I wrote code to seaparate the date and time in the "Date_time" column, but did not apply it to the current Haute_clean.csv on my github repository, since I am not sure yet what the advantage of that will be. If I end up working with time series analysis I will probably break up that column. Further steps for cleaning may become necessary but for now I will submit this write-up. 
