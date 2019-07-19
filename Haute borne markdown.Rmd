@@ -1,0 +1,142 @@
+---
+title: "clean Haute Borne Windfarm"
+author: "Max Davis"
+date: "6/29/2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+Load packages and libraries
+
+```{r}
+
+install.packages("readr")
+library("readr")
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+```
+
+Read data for full Haute Born Wind farm from 2017 to 2020, and the data description file or metadata:
+
+```{r}
+haute_all_2017_2020 <- read_csv2("~/Desktop/DATA/Haute Borne Wind Farm Data/la-haute-borne-data-2017-2020.csv")
+
+data_description <- read_csv2("~/Desktop/DATA/Haute Borne Wind Farm Data/data_description.csv")
+```
+
+
+make tibble:
+
+```{r}
+haute <- tbl_df(haute_all_2017_2020)
+
+```
+
+run functions that change problematic variable names (those that happen containing gsub two-letter name) before changing the rest.
+
+```{r}
+
+colClean27 <- function(x) { colnames(x) <- gsub(pattern = "P", "Active_power", colnames(x)) ; x}
+colClean20 <- function(x) { colnames(x) <- gsub(pattern = "Va", "Vane_position", colnames(x)) ; x}
+
+
+  haute_clean_1 <-
+  haute %>%
+  colClean27() %>%
+   colClean20()
+
+```
+
+Create functions for each variable name that subs in long descriptions
+
+```{r}
+
+colClean <- function(x) { colnames(x) <- gsub(pattern = "Q", "Reactive_power", colnames(x)) ; x} 
+colClean2 <- function(x) {colnames(x) <- gsub(pattern = "Va2", "Vane_position_2", colnames(x)) ;x} 
+colClean3 <- function(x) { colnames(x) <- gsub(pattern = "Ws2", "Wind_speed_2", colnames(x)) ; x}
+colClean4 <- function(x) { colnames(x) <- gsub(pattern = "Ws", "Wind_speed", colnames(x)) ; x}
+colClean5 <- function(x) { colnames(x) <- gsub(pattern = "Dst", "Generator_stator_temperature", colnames(x)) ; x}
+colClean6 <- function(x) { colnames(x) <- gsub(pattern = "Git", "Gearbox_inlet_temperature", colnames(x)) ; x}
+colClean7 <- function(x) { colnames(x) <- gsub(pattern = "Ot", "Outdoor_temperature", colnames(x)) ; x}
+colClean8 <- function(x) { colnames(x) <- gsub(pattern = "Yt", "Nacelle_temperature", colnames(x)) ; x}
+colClean9 <- function(x) { colnames(x) <- gsub(pattern = "Nf", "Grid_frequency", colnames(x)) ; x}
+colClean10 <- function(x) { colnames(x) <- gsub(pattern = "Nu", "Grid_voltage", colnames(x)) ; x}
+colClean11 <- function(x) { colnames(x) <- gsub(pattern = "Rm", "Torque", colnames(x)) ; x}
+colClean12 <- function(x) { colnames(x) <- gsub(pattern = "Wa_c", "Absolute_wind_direction_corrected", colnames(x)) ; x}
+colClean13 <- function(x) { colnames(x) <- gsub(pattern = "Na_c", "Nacelle_angle_corrected", colnames(x)) ; x}
+colClean14 <- function(x) { colnames(x) <- gsub(pattern = "Gb2t", "Gearbox_bearing_2_temperature", colnames(x)) ; x}
+colClean15 <- function(x) { colnames(x) <- gsub(pattern = "Gost", "Gearbox_oil_sump_temperature", colnames(x)) ; x}
+colClean16 <- function(x) { colnames(x) <- gsub(pattern = "DCs", "Generator_converter_speed", colnames(x)) ; x}
+colClean17 <- function(x) { colnames(x) <- gsub(pattern = "Wa", "Absolute_wind_direction", colnames(x)) ; x}
+colClean18 <- function(x) { colnames(x) <- gsub(pattern = "Ds", "Generator_speed", colnames(x)) ; x}
+colClean19 <- function(x) { colnames(x) <- gsub(pattern = "Cm", "Converter_torque", colnames(x)) ; x}
+
+colClean21 <- function(x) { colnames(x) <- gsub(pattern = "Ya", "Nacelle_angle", colnames(x)) ; x}
+colClean22 <- function(x) { colnames(x) <- gsub(pattern = "Rs", "Rotor_speed", colnames(x)) ; x}
+colClean23 <- function(x) { colnames(x) <- gsub(pattern = "S", "Apparent_power", colnames(x)) ; x}
+colClean24 <- function(x) { colnames(x) <- gsub(pattern = "Cosphi", "Power_factor", colnames(x)) ; x}
+colClean25 <- function(x) { colnames(x) <- gsub(pattern = "Rt", "Hub_temperature", colnames(x)) ; x}
+colClean26 <- function(x) { colnames(x) <- gsub(pattern = "Ba", "Pitch_angle", colnames(x)) ; x}
+colClean28 <- function(x) { colnames(x) <- gsub(pattern = "Va1", "Vane_position_1", colnames(x)) ; x}
+colClean29 <- function(x) { colnames(x) <- gsub(pattern = "Ws1", "Wind_speed_1", colnames(x)) ; x}
+colClean30 <- function(x) { colnames(x) <- gsub(pattern = "Db2t", "Generator_bearing_2_temperature", colnames(x)) ; x}
+colClean31 <- function(x) { colnames(x) <- gsub(pattern = "Db1t", "Generator_bearing_1_temperature", colnames(x)) ; x}
+colClean32 <- function(x) { colnames(x) <- gsub(pattern = "Gb1t", "Gearbox_bearing_1_temperature", colnames(x)) ; x}
+colClean33 <- function(x) { colnames(x) <- gsub(pattern = "Rbt", "Rotor_bearing_temperature", colnames(x)) ; x}
+colClean34 <- function(x) { colnames(x) <- gsub(pattern = "Pas", "Pitch_angle_setpoint", colnames(x)) ; x}
+```  
+
+Run each function from previous code chunk on haute_clean_1 and store as haute_clean:
+
+```{r}
+haute_clean <-
+
+  haute_clean_1 %>% 
+  colClean() %>%
+  colClean2() %>%
+  colClean3() %>%
+  colClean4() %>%
+colClean5() %>%
+colClean6() %>%
+colClean7() %>%
+colClean8() %>%
+colClean9() %>%
+colClean10() %>%
+colClean11() %>%
+colClean12() %>%
+colClean13() %>%
+colClean14() %>%
+colClean15() %>%
+colClean16() %>%
+colClean17() %>%
+colClean18() %>%
+colClean19() %>%
+colClean21() %>%
+colClean22() %>%
+colClean23() %>%
+colClean24() %>%
+colClean25() %>%
+colClean26() %>%
+colClean28() %>%
+colClean29() %>%
+colClean30() %>%
+colClean31() %>%
+colClean32() %>%
+colClean33() %>%
+colClean34()
+```
+
+```{r}
+View(haute_clean)
+```
+
+
+```{r}
+write.csv(file = "haute_clean.csv", "~/Desktop/DATA/Haute Borne Wind Farm Data/Haute_output")
+```
+
+
+
