@@ -1,5 +1,5 @@
 ---
-title: "clean Haute Borne Windfarm"
+title: "clean Haute Borne Windfarm Data"
 author: "Max Davis"
 date: "6/29/2019"
 output:
@@ -12,25 +12,30 @@ Load packages and libraries
 ```{r}
 
 install.packages("readr")
+install.packages("data.table")
+```
+
+```{r}
 library("readr")
 library(dplyr)
 library(tidyr)
 library(ggplot2)
-
+library(data.table)
 ```
 
-Read data for full Haute Born Wind farm from 2017 to 2020, and the data description file or metadata:
+Read data for full Haute Born Wind farm from 2017 to 2020, and the data description file or metadata using the fread() function with data.table = FALSE:
 
 ```{r}
-haute_all_2017_2020 <- read_csv2("~/Desktop/DATA/Haute Borne Wind Farm Data/la-haute-borne-data-2017-2020.csv")
+haute_all_2017_2020 <- fread("~/Desktop/DATA/Haute Borne Wind Farm Data/la-haute-borne-data-2017-2020.csv", data.table = FALSE)
 
-data_description <- read_csv2("~/Desktop/DATA/Haute Borne Wind Farm Data/data_description.csv")
+data_description <- fread("~/Desktop/DATA/Haute Borne Wind Farm Data/data_description.csv")
 ```
 
 
 make tibble:
 
 ```{r}
+
 haute <- tbl_df(haute_all_2017_2020)
 
 ```
@@ -73,13 +78,13 @@ colClean16 <- function(x) { colnames(x) <- gsub(pattern = "DCs", "Generator_conv
 colClean17 <- function(x) { colnames(x) <- gsub(pattern = "Wa", "Absolute_wind_direction", colnames(x)) ; x}
 colClean18 <- function(x) { colnames(x) <- gsub(pattern = "Ds", "Generator_speed", colnames(x)) ; x}
 colClean19 <- function(x) { colnames(x) <- gsub(pattern = "Cm", "Converter_torque", colnames(x)) ; x}
-
 colClean21 <- function(x) { colnames(x) <- gsub(pattern = "Ya", "Nacelle_angle", colnames(x)) ; x}
 colClean22 <- function(x) { colnames(x) <- gsub(pattern = "Rs", "Rotor_speed", colnames(x)) ; x}
 colClean23 <- function(x) { colnames(x) <- gsub(pattern = "S", "Apparent_power", colnames(x)) ; x}
 colClean24 <- function(x) { colnames(x) <- gsub(pattern = "Cosphi", "Power_factor", colnames(x)) ; x}
 colClean25 <- function(x) { colnames(x) <- gsub(pattern = "Rt", "Hub_temperature", colnames(x)) ; x}
 colClean26 <- function(x) { colnames(x) <- gsub(pattern = "Ba", "Pitch_angle", colnames(x)) ; x}
+
 colClean28 <- function(x) { colnames(x) <- gsub(pattern = "Va1", "Vane_position_1", colnames(x)) ; x}
 colClean29 <- function(x) { colnames(x) <- gsub(pattern = "Ws1", "Wind_speed_1", colnames(x)) ; x}
 colClean30 <- function(x) { colnames(x) <- gsub(pattern = "Db2t", "Generator_bearing_2_temperature", colnames(x)) ; x}
@@ -132,11 +137,9 @@ colClean34()
 ```{r}
 View(haute_clean)
 ```
-
+Make a .csv file in the working directory:
 
 ```{r}
-write.csv(file = "haute_clean.csv", "~/Desktop/DATA/Haute Borne Wind Farm Data/Haute_output")
+write.csv(haute_clean, file = "haute_clean.csv")
 ```
-
-
 
