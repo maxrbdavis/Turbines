@@ -1,0 +1,133 @@
+---
+title: "Capstone Exploratory Plots"
+author: "Max Davis"
+date: "7/26/2019"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+What is the relationship between wind speed and active power? 
+From the plot below we can observe a strong positive relationship between Active Power and Wind Speed, and this makes intuitive sense. 
+```{r}
+ggplot(haute, aes(x = Wind_speed_avg, y = Active_power_avg))+
+  geom_point() +
+  facet_wrap(~Wind_turbine_name)
+```
+
+
+
+Can we learn anything more by mapping the date to color as seen below? The break away groupings in each of the turbines mostly seem to be in the chronologically earlier part of the sample, appearing as dark spikes to the left of the main grouping. Could it be that the turbines are running more efficiently sooner after installation? However, the highest points of efficiency (where there is wind speed around 5 m/s, and high active power) are later in the time series, lighter in color. Also, why might turbine R80711 have a significantly larger range of active power readings at the higher wind speeds? Above ~12.5 m/s, the correlation wind speed and active power becomes unclear.
+
+```{r}
+ggplot(haute, aes(x = Wind_speed_avg, y = Active_power_avg))+
+  geom_point(aes(color = down), alpha = .5) +
+  facet_wrap(~Wind_turbine_name)
+```
+
+
+Maybe we can limit our dates to the beginning of 2017 and figure out what might be going on. The plot below shows a more isolated cross section of the anomalous areas of the scatterplot above. For the two apparently deviating wind turbines (R80790 and R80711, upper left and lower right, respectively), the seeming spike in active power is roughly when the wind is between 3 and 6 m/s. More investigation would be necessary to determine how significant these clusters of data may be. Can we predict when this spike in efficiency will occur? Also visible here, in three out of four of the turbines in this period, there are many data points at which zero active power is recorded, and at wind speeds when we would expect to see Active Power increasing.
+
+```{r}
+haute %>%
+  filter(date < as.Date("2017-2-28")) %>%
+  filter(Wind_speed_avg < 7) %>%
+  filter(Wind_speed_avg > 2) %>%
+  ggplot(., aes(x = Wind_speed_avg, y = Active_power_avg))+
+  geom_point(aes(color = date), alpha = .5) +
+  facet_wrap(~Wind_turbine_name) +
+  geom_smooth()
+```
+
+
+Now lets try comparing wind speeds over time, and how the active power is affected. Maybe that will clarify some things. Over a full year period, the plot below shows some densely packed periods of wind increase and decrease, with a generally corresponding increase and decrease of Active Power. The dark spikes seem to indicate low to zero active power at high wind speeds.
+```{r}
+ggplot(haute, aes(x = date, y = Wind_speed_avg)) +
+  geom_point(aes(color = Active_power_avg))+
+  geom_smooth() +
+  scale_x_date(date_breaks = "6 month") +
+  facet_wrap(~Wind_turbine_name)
+```
+As an experiment, lets try to isolate the darkest spike in the R80790 time series. Since this is an unexpected lack of Active Power at high wind speeds, we'll filter out that turbine, and filter a date range that will give us a better spread of data points in our plot, a nine day period in which the spike occurs. We'll continue mapping Active Power to color, but change the date break to 1 day instead of 6 months so we can see which days exactly we are talking about. The plot, shown below, tells us that the spike from the plot above is really just a two day period, February 3rd and 4th of 2017, when despite the windy conditions, and the three other turbines producing power, this turbine was not producing. We might be able to figure out if it was down for service from looking at service records, or we can read into the data to figure out if something else was created a fault and if there might have been a predictor for that fault. 
+```{r}
+haute %>%
+  filter(date < as.Date("2017-02-8")) %>%
+  filter(date > as.Date("2017-01-29")) %>%
+  filter(Wind_turbine_name == "R80790") %>%
+  ggplot(aes(x = date, y = Wind_speed_avg)) +
+  geom_point(aes(color = Active_power_avg))+
+  geom_smooth() +
+  scale_x_date(date_breaks = "1 day") +
+  facet_wrap(~Wind_turbine_name)
+```
+
+Now for fun, lets see the same exact plot but for all four turbines. Looks like the wind speed and active power are pretty similar across turbines that week, except the two days when R80790 goes dark.
+
+```{r}
+haute %>%
+  filter(date < as.Date("2017-02-8")) %>%
+  filter(date > as.Date("2017-01-29")) %>%
+  ggplot(aes(x = date, y = Wind_speed_avg)) +
+  geom_point(aes(color = Active_power_avg))+
+  geom_smooth() +
+  scale_x_date(date_breaks = "3 day") +
+  facet_wrap(~Wind_turbine_name)
+```
+
+
+I want to filter more precisely, and just look at the first of the 'down' days, and compare the turbines on some other features during that day. It would be best if I could get the time column into a time format that makes sense.
+```{r}
+haute %>%
+  filter(date < as.Date("2017-02-5")) %>%
+  filter(date > as.Date("2017-01-29")) %>%
+  filter(Active_power_avg < 100) %>%
+  filter(Wind_speed_avg > 5) %>%
+    ggplot(aes(x = time, y = Wind_speed1_avg)) +
+  geom_point(aes(color = Active_power_avg))+
+  geom_smooth() +
+  facet_wrap(~Wind_turbine_name)
+```
+
+
+Can I see the entire data set with these filters, when the wind speed is above 5 m/s
+
+```{r}
+haute %>%
+  filter(Wind_speed_avg > 2) %>%
+    ggplot(aes(x = date, y = Wind_speed_avg)) +
+  geom_point(aes(color = Active_power_avg))+
+  geom_smooth() +
+  facet_wrap(~Wind_turbine_name)
+```
+
+
+
+The grid operates at 50Hz, when does grid frequency drop below 50 Hertz, and does this tell us anything?:
+
+```{r}
+ggplot(haute, aes(x = date, y = Grid_frequency_avg)) +
+  geom_point(aes(color = Wind_speed_avg)) +
+  facet_wrap(~Wind_turbine_name) +
+  scale_y_continuous(limits = c(0,49))
+```
+
+The relationship between active and reactive power:
+
+```{r}
+ggplot(haute, aes(x = Active_power_avg, y = Reactive_power_avg, color = date)) +
+  geom_point() +
+  facet_wrap(~Wind_turbine_name)
+ 
+```
+In all 4 wind turbines there is a cluster offshoot where the relationship between active power and reactive power is inverted. 
+
+
+
+
+
