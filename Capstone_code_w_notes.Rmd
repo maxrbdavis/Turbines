@@ -1,0 +1,210 @@
+---
+title: "Haute_run"
+author: "Max Davis"
+date: "9/29/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I will load some libraries that I will use for exploring the data, and for cleaning it.
+```{r}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(data.table)
+```
+##Read data and cleaning
+Read data for full Haute Born Wind farm from 2017 to 2020, and the data description file or metadata using the fread() function with data.table = FALSE:
+
+```{r}
+haute_all_2017_2020 <- fread("la-haute-borne-data-2017-2020.csv", data.table = FALSE)
+data_description <- fread("data_description.csv")
+```
+
+Make tibble of data:
+
+```{r}
+haute <- tbl_df(haute_all_2017_2020)
+metadata <- tbl_df(data_description)
+```
+
+Make a list of old names and one of replacement names from metadata:
+
+```{r}
+old <- metadata[,"Variable_name"]
+new <- metadata[, "Variable_long_name"]
+```
+
+Create a function to replace old names with a corresponding longer name on the new names list:
+
+```{r}
+fast_clean <- function(df, x) {colnames(df) <- gsub (old[[c(1, x)]], new[[c(1, x)]], colnames(df)) ; df}
+```
+
+Apply the fast_clean function first to two column names that would create distortions in a while loop
+
+```{r}
+haute<- fast_clean(haute, 20)
+haute<- fast_clean(haute, 27)
+```
+
+Use a while loop to take the old part of each column name and replace it by increments, skipping variable 20 and 27, which I have already done in the previous code chunk.
+
+```{r}
+n <- 1
+while(n < 20) {haute <- fast_clean(df = haute, x = n)
+  n <- (n + 1)
+  }
+n <- 21
+while(n < 27) {haute <- fast_clean(df = haute, x = n)
+  n <- (n + 1)
+  }
+n <- 28
+while(n <= 34) {haute <- fast_clean(df = haute, x = n)
+  n <- (n + 1)
+  }
+``` 
+
+Separate date and time in the datetime column. 
+
+```{r}
+haute <- separate(haute, "Date_time", c("date", "time"), sep = "T", remove = TRUE, convert = FALSE, extra = "warn", fill = "warn")
+
+```
+
+Make Date into date format.
+
+```{r}
+haute$date <- as.Date(haute$date, "%Y-%m-%d")
+```
+
+The code is ready for some meaningful exploration. See "Exploratory Plots.rmd" .
+
+
+##Feature Engineering and Machine Learning
+
+In the exploration phase of the project, I decided to look at instances of turbines not functioning as intended. This wil require first some feature engineering. I will create a new feature "down" that displays a 1 if the wind speed is above 5 m/s but average active power is below 50 kW.
+
+```{r}
+
+down <- ifelse(haute$Wind_speed_avg > 5 & haute$Active_power_avg < 50, 1, 0)
+summary(down)
+haute$down <- as.factor(down)
+class(haute$down)
+```
+
+I want to make a smaller data frame of only the average reading for each entry, this will remove a large amount of the data. I will call this haute_avgs and remove the turbine ID, date, and Time but include the new binary feature, "down"
+
+```{r}
+down <- haute$down
+haute_avgs <- select(haute, contains("avg"))
+haute_avgs <- select(haute_avgs, -c(1,2,3))
+haute_avgs <- cbind(haute_avgs, down)
+head(haute_avgs)
+
+```
+
+I will view the number of missing values in each column.
+
+```{r}
+missing.values <- haute_avgs %>%
+  gather(key = "key", value = "val") %>%
+  mutate(is.missing = is.na(val)) %>%
+  group_by(key, is.missing) %>%
+  summarise(num.missing = n()) %>%
+  filter(is.missing==T) %>%
+  select(-is.missing) %>%
+  arrange(desc(num.missing)) 
+missing.values
+
+```
+
+I will remove 6 columns from the dataset with the most NAs (over 6000 missing values). How many missing values is too many? This could be a place for further experimentation to improve a machine learning model.
+
+```{r}
+haute_avgs <- select(haute_avgs, -contains("Active_poweras_avg"))
+haute_avgs <- select(haute_avgs, -contains("Absolute_wind_direction_corrected_avg"))
+haute_avgs <- select(haute_avgs, -contains("Nacelle_angle_corrected_avg"))
+haute_avgs <- select(haute_avgs, -contains("Vane_position1_avg"))
+haute_avgs <- select(haute_avgs, -contains("Vane_position2_avg"))
+haute_avgs <- select(haute_avgs, -contains("Vane_position_avg"))
+```
+
+Do I need to remove wind speed and active power, the two variables which determine the feature "down"? For now, I will do so.
+
+```{r}
+haute_avgs <- select(haute_avgs, -contains("Active_power_avg"))
+haute_avgs <- select(haute_avgs, -contains("Wind_speed_avg"))
+```
+
+Now haute_avgs is the working dataset. Lets check the balance. This will be important as the model used on the data will be logistic regression. This will also be considered the baseline prediction for negative cases. 
+
+```{r}
+table(haute_avgs$down)
+down_table <- table(haute_avgs$down)
+down_table
+down_table[1]/(down_table[1] + down_table[2])
+```
+
+A plot of this dataset with "down" mapped to color will highlight the cases I am interested in predicting.
+```{r}
+ggplot(haute, aes(x = Wind_speed_avg, y = Active_power_avg))+
+  geom_point(aes(color = down)) +
+  labs(x = "Average Wind Speed (m/s)", y = "Active Power (kW)")
+```
+
+The positive cases of "down" is only about 1.2%. which means I will need to balance the data.
+I will use the SMOTE function from the caret package which combines upsampling and downsampling. This gives a data set with 17,000 observations, and a balance of 75/25.
+
+```{r}
+library(caret)
+library(DMwR)
+set.seed(2555)
+smote_haute_avgs <- SMOTE(down ~ ., data = haute_avgs)
+smoted_haute_avgs <- table(smote_haute_avgs$down)
+smoted_haute_avgs[2]/smoted_haute_avgs[1]
+```
+
+Now I want to create a logistic regression model based on this smaller subset of data.
+I'll split the balanced data into a train and test set with split.seed from caTools.
+
+```{r}
+library(caTools)
+set.seed(2555)
+split <- sample.split(smote_haute_avgs$down, SplitRatio = .65)
+train <- subset(smote_haute_avgs, split == TRUE)
+test <- subset(smote_haute_avgs, split == FALSE)
+table(train$down)
+table(test$down)
+```
+
+I will create a logistic regression model to predict "down" using the training set. 
+
+```{r}
+trainlogistic <- glm(down ~ ., data = train, family = binomial)
+summary(trainlogistic)
+```
+
+Now I will predict in the test set which turbines are down, using the logistic regression model I have just made, I will observe the confusion matrix resulting from a threshold of .5.
+
+```{r}
+predictTest <- predict(trainlogistic, type = "response", newdata = test)
+table(test$down, predictTest > 0.5)
+```
+
+I will measure the performance of this model overall by measuring the area under the ROC curve.
+
+```{r}
+library(ROCR)
+ROCRpred <- prediction(predictTest, test$down)
+as.numeric(performance(ROCRpred, "auc")@y.values)
+```
+
+The area under an ROC curve is .9998. As a measure of accuracy for this model, that is a minor improvement over the baseline of .9885.
+
+
+
